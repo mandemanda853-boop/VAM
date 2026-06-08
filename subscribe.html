@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Subscribe — VAMMalawiApp</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <meta name="theme-color" content="#071014">
+  </head>
+  <body class="subscribe-page">
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="brand">
+          <a href="/" class="logo">VAM<span class="logo-accent">MalawiApp</span></a>
+          <span class="slogan">Fast Agent Digital Marketplace</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="hero">
+      <div class="container hero-inner">
+  <h1 class="site-title">Subscribe your account</h1>
+  <p class="site-tagline">Join to confirm your payment and subscribe your account for access and updates.</p>
+
+        <div class="doc-section" style="max-width:680px;width:100%">
+          <form id="subscribe-page-form">
+            <label for="email" class="lead">Email address (for confirmation)</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required>
+
+            <label for="userId" class="lead" style="margin-top:10px">User ID</label>
+            <input id="userId" name="userId" type="text" placeholder="Your VAMMalawiApp user ID" required>
+
+            <label for="amount" class="lead" style="margin-top:10px">Amount (MWK)</label>
+            <input id="amount" name="amount" type="number" placeholder="000" min="0" step="0.01" required>
+
+            <label for="txn" class="lead" style="margin-top:10px">Transaction number</label>
+            <input id="txn" name="txn" type="text" placeholder="e.g. 0123456789 or +265123456789" required>
+            <div class="txn-hint">
+              <small id="txn-format" class="muted"></small>
+              <small id="txn-remaining" class="muted" style="margin-left:12px"></small>
+            </div>
+
+            <label for="source" class="lead" style="margin-top:10px">Source of transaction</label>
+            <select id="source" name="source" required>
+              <option value="">Select payment method</option>
+              <option value="airtel">Airtel Money</option>
+              <option value="tnm">TNM Mpamba</option>
+            </select>
+
+            <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end;align-items:center">
+              <a href="/" class="btn small">Back</a>
+              <button type="submit" class="btn btn-download" id="confirm-btn" disabled>Confirm</button>
+            </div>
+          </form>
+          <div id="subscribe-page-success" class="subscribe-success" hidden style="margin-top:14px">
+            <p>Thank you — your payment confirmation has been recorded. We will verify and follow up by email.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer container">
+      <p>© <span id="year"></span> VAMMalawiApp</p>
+    </footer>
+
+    <script>
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      (function(){
+        const form = document.getElementById('subscribe-page-form');
+        const email = document.getElementById('email');
+  const userId = document.getElementById('userId');
+  const amount = document.getElementById('amount');
+  const txn = document.getElementById('txn');
+  const source = document.getElementById('source');
+        const success = document.getElementById('subscribe-page-success');
+        const txnFormatEl = document.getElementById('txn-format');
+        const txnRemainingEl = document.getElementById('txn-remaining');
+
+        // Live formatting and remaining digits for Malawi numbers
+        (function(){
+          const maxDigits = 10; // allow up to 10 raw digits (leading 0 + 9 digits)
+          let prev = '';
+          txn.addEventListener('input', function(){
+            let raw = (txn.value||'').replace(/\D/g,'');
+            if(raw.length > maxDigits) raw = raw.slice(0, maxDigits);
+
+            // reflect the cleaned value back into the input so the field never holds > maxDigits
+            if(txn.value !== raw) txn.value = raw;
+
+            // remaining digits (to reach maxDigits)
+            const remaining = Math.max(0, maxDigits - raw.length);
+
+            // build formatted preview: show +265 plus up to 9 subscriber digits
+            let preview = '';
+            if(raw.startsWith('0')){
+              const sub = raw.slice(1); // drop leading zero
+              preview = sub ? ('+265 ' + sub) : '+265 ';
+            } else {
+              // use up to last 9 digits as subscriber number
+              const sub = raw.slice(-9);
+              preview = sub ? ('+265 ' + sub) : '';
+            }
+
+            txnFormatEl.textContent = preview ? ('Formatted: ' + preview) : '';
+            txnRemainingEl.textContent = remaining + ' digits left';
+            prev = raw;
+          });
+        })();
+
+        form.addEventListener('submit', function(e){
+          e.preventDefault();
+          const emailVal = (email.value||'').trim();
+          const userVal = (userId.value||'').trim();
+          const amountVal = (amount.value||'').trim();
+          const txnVal = (txn.value||'').trim();
+          const srcVal = (source.value||'').trim();
+
+          // Simple validations
+          if(!emailVal || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emailVal)){
+            email.focus();
+            email.style.outline = '2px solid rgba(255,80,80,0.12)';
+            setTimeout(()=>email.style.outline='none',1200);
+            return;
+          }
+          if(!userVal){ userId.focus(); userId.style.outline='2px solid rgba(255,80,80,0.12)'; setTimeout(()=>userId.style.outline='none',1200); return; }
+          // validate amount is a positive number
+          const amountNum = parseFloat(amountVal);
+          if(isNaN(amountNum) || amountNum <= 0){ amount.focus(); amount.style.outline='2px solid rgba(255,80,80,0.12)'; setTimeout(()=>amount.style.outline='none',1200); return; }
+          if(!txnVal){ txn.focus(); txn.style.outline='2px solid rgba(255,80,80,0.12)'; setTimeout(()=>txn.style.outline='none',1200); return; }
+          if(!srcVal){ source.focus(); source.style.outline='2px solid rgba(255,80,80,0.12)'; setTimeout(()=>source.style.outline='none',1200); return; }
+
+          // Normalize transaction / phone number (try to convert 0XXXXXXXXX to +265XXXXXXXXX)
+          const rawTxn = (txnVal||'').replace(/\D/g,'');
+          let normalizedTxn = txnVal;
+          if(rawTxn.startsWith('0')){
+            normalizedTxn = '+265' + rawTxn.slice(1);
+          } else if(rawTxn.length === 9){
+            normalizedTxn = '+265' + rawTxn;
+          } else if(rawTxn.startsWith('265')){
+            normalizedTxn = '+' + rawTxn;
+          }
+
+          // Validate normalized number has 9 digits after country code
+          const digitsOnly = (normalizedTxn||'').replace(/\D/g,'');
+          let digitsAfter = digitsOnly;
+          if(digitsOnly.startsWith('265')) digitsAfter = digitsOnly.slice(3);
+          if(digitsAfter.length !== 9){
+            txn.focus(); txn.style.outline = '2px solid rgba(255,80,80,0.12)';
+            setTimeout(()=>txn.style.outline='none',1200);
+            return;
+          }
+
+          // Save payment confirmation locally
+          try{
+            const records = JSON.parse(localStorage.getItem('vamm_payments')||'[]');
+            records.push({email:emailVal,userId:userVal,amount:amountNum,txn:normalizedTxn,source:srcVal,ts:Date.now()});
+            localStorage.setItem('vamm_payments', JSON.stringify(records));
+          }catch(err){ /* ignore */ }
+
+          form.hidden = true;
+          success.hidden = false;
+        });
+      })();
+    </script>
+  </body>
+</html>
