@@ -1,60 +1,8 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Subscribe — VAMMalawiApp</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <meta name="theme-color" content="#071014">
-  </head>
-  <body class="subscribe-page">
-    <header class="site-header">
-      <div class="container header-inner">
-        <div class="brand">
-          <a href="/" class="logo">VAM<span class="logo-accent">MalawiApp</span></a>
-          <span class="slogan">Fast Agent Digital Marketplace</span>
-        </div>
-      </div>
-    </header>
 
-    <main class="hero">
-      <div class="container hero-inner">
-  <h1 class="site-title">Subscribe your account</h1>
-  <p class="site-tagline">Join to confirm your payment and subscribe your account for access and updates.</p>
 
-        <div class="doc-section" style="max-width:680px;width:100%">
-          <form id="subscribe-page-form">
-            <label for="email" class="lead">Email address (for confirmation)</label>
-            <input id="email" name="email" type="email" placeholder="you@example.com" required>
-
-            <label for="userId" class="lead" style="margin-top:10px">User ID</label>
-            <input id="userId" name="userId" type="text" placeholder="Your VAMMalawiApp user ID" required>
-
-            <label for="amount" class="lead" style="margin-top:10px">Amount (MWK)</label>
-            <input id="amount" name="amount" type="number" placeholder="000" min="0" step="0.01" required>
-
-            <label for="txn" class="lead" style="margin-top:10px">Transaction number</label>
-            <input id="txn" name="txn" type="text" placeholder="e.g. 0123456789 or +265123456789" required>
-            <div class="txn-hint">
-              <small id="txn-format" class="muted"></small>
-              <small id="txn-remaining" class="muted" style="margin-left:12px"></small>
             </div>
 
-            <label for="source" class="lead" style="margin-top:10px">Source of transaction</label>
-            <select id="source" name="source" required>
-              <option value="">Select payment method</option>
-              <option value="airtel">Airtel Money</option>
-              <option value="tnm">TNM Mpamba</option>
-            </select>
 
-            <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end;align-items:center">
-              <a href="/" class="btn small">Back</a>
-              <button type="submit" class="btn btn-download" id="confirm-btn" disabled>Confirm</button>
-            </div>
-          </form>
-          <div id="subscribe-page-success" class="subscribe-success" hidden style="margin-top:14px">
-            <p>Thank you — your payment confirmation has been recorded. We will verify and follow up by email.</p>
-          </div>
         </div>
       </div>
     </main>
